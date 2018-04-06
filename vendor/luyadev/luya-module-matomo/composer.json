@@ -1,0 +1,32 @@
+{
+	"name" : "luyadev/luya-module-matomo",
+	"description" : "Matomo (former piwik) analytics",
+	"type" : "luya-module",
+	"keywords" : ["php", "luya", "module", "matomo", "piwik"],
+	"license": "MIT",
+	"homepage" : "http://luya.io",
+	"authors" : [
+		{
+			"name" : "Basil",
+			"email" : "git@nadar.io",
+			"homepage" : "https://github.com/nadar"
+		}
+	],
+	"support" : {
+		"issues" : "https://github.com/luyadev/luya-module-matomo/issues"
+	},
+	"require-dev" : {
+		"luyadev/luya-testsuite" : "~1.0.0"
+	},
+	"autoload" : {
+		"psr-4" : {
+			"luya\\matomo\\" : "src/",
+			"luya\\matomo\\tests\\" : "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}

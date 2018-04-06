@@ -1,0 +1,38 @@
+{
+  "minimum-stability" : "RC",
+  "name" : "luyadev/luya-module-addressbook",
+  "description" : "This module provides a simple addressbook management for admin and frontend rendering.",
+  "type" : "luya-module",
+  "keywords" : ["php", "luya", "module", "cms", "yii2", "yii", "addressbook", "contacts", "contactlist", "gridview", "address"],
+  "license": "MIT",
+  "homepage" : "http://luya.io",
+  "authors" : [
+    {
+      "name" : "Martin",
+      "email" : "git@martinpetrasch.com",
+      "homepage" : "https://github.com/martinpetrasch"
+    }
+  ],
+  "require-dev" : {
+    "luyadev/luya-module-admin" : "1.0.0-RC3",
+    "luyadev/luya-testsuite" : "^1.0@dev"
+  },
+  "support" : {
+    "issues" : "https://github.com/luyadev/luya-module-addressbook/issues"
+  },
+  "autoload" : {
+    "psr-4" : {
+      "luya\\addressbook\\" : "src/"
+    }
+  },
+  "autoload-dev" : {
+    "psr-4" : {
+      "luya\\addressbook\\tests\\" : "tests/"
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  }
+}
