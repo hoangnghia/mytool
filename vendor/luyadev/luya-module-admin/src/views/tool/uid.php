@@ -27,8 +27,10 @@
                     $('#lstSearchUIDGroupByName')['html']('');
                     for (var b = 0; b < a['data']['length']; b++) {
                         var c = a['data'][b];
-                        $('#lstSearchUIDGroupByName').append('<li class="list-group-item"><span>' + c['name'] + '</span><a data-id="' + c['id'] + '" style="float:right" href="javascript:;" class="btn btn-xs blue"><i class="material-icons"></i></a></li>')
+                        var page = a['paging'];
+                        $('#lstSearchUIDGroupByName').append('<li class="list-group-item"><span>' + c['name'] + '</span><a data-id="' + c['id'] + '" style="float:right;color: #FFF; background-color: #3598dc; border-color: #3598dc;" href="javascript:;" class="btn btn-xs blue"><i class="material-icons">search</i></a></li>')
                     };
+                    $('#lstSearchUIDGroupByName').append('<li class="list-group-item"><span ng-click="more-group" style="color: #4080ff; font-weight: bold; cursor: pointer;" data-url="' + page['next'] + '">Xem tất cả kết quả cho '+$scope.group_name+'</span></li>')
                 },
                 error: function(a) {}
             })
