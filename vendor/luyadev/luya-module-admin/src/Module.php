@@ -275,7 +275,7 @@ final class Module extends \luya\admin\base\Module implements CoreModuleInterfac
                     ->itemApi('Builds', 'admin/proxy-build/index', 'import_export', 'api-admin-proxybuild')
             ->node('Tools', 'build')
                 ->group('Facebook')
-                    ->itemApi('Get UID', 'admin/tool/uid', 'person', 'api-admin-user')
+                    ->itemApi('Tìm UID Facebook', 'admin/tool/uid', 'person', 'api-admin-user')
                     ->itemApi('Get People likes', 'admin/tool/like', 'person', 'api-admin-user')
                     ->itemApi('Get Profile Details', 'admin/tool/profile', 'person', 'api-admin-user');
     }

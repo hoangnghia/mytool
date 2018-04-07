@@ -33,7 +33,7 @@ class ToolController extends Controller
         return $this->render('uid');
     }
 
-    public $access_token = 'EAAAAUaZA8jlABAEHHOh3pESwpuPrck4q2jC9Gm9JPIsF7zpHuZBYl7WQr2x5IZCi9xExgHSmnAx5PtZADlUlA3ihEBrTElBkZC7MTGNdsBPTOUlyDKXerWzrPZAbAWWZCimVtUFmoHlVvQoR4LXZB2D6DXa71vSNN67CI8RIZB1FnoVu8jvEd4e24cgICnZAJY8lvyhM95pO9OY8NgufhXAa5N';
+    public $access_token = 'EAAAAUaZA8jlABAAFiOqPijM3luxyXrtHwU1vcJhEyyvwxHNW7ES0chH2LjaZCUDKcamwOTBT5DABEqcYasGSzQW72AxebbuZAkAoFXa1YOgW6ow8QqTFVkgLek3GFguYBCGXbPeDF6wSYIijTEpELj29ZAzf2IQ2VSKwQ41dzaWCEVHqzIe9mkgDOijATmlgYuZBPLMt5CSOXDkwjNM7s';
 
     public function actionLike(){
         return $this->render('like');

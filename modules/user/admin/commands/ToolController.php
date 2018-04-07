@@ -18,7 +18,7 @@ use PHPExcel_IOFactory;
  */
 class ToolController extends \luya\console\Command
 {
-    public $access_token = 'EAAAAUaZA8jlABAEHHOh3pESwpuPrck4q2jC9Gm9JPIsF7zpHuZBYl7WQr2x5IZCi9xExgHSmnAx5PtZADlUlA3ihEBrTElBkZC7MTGNdsBPTOUlyDKXerWzrPZAbAWWZCimVtUFmoHlVvQoR4LXZB2D6DXa71vSNN67CI8RIZB1FnoVu8jvEd4e24cgICnZAJY8lvyhM95pO9OY8NgufhXAa5N';
+    public $access_token = 'EAAAAAYsX7TsBAG434mBc5TeWJUfSbgBfCVgm1qkjDZBjyDYbRhMNf7DUGvm04prQyhBnsCswr1ZAT9qnBlFyoXFHx5Lk2zDIg4ZBHhqa9bDVKZAlSFTwjZARWWZCdwFoxMFUHBZAGGVroHrWQlJjXUsLEM5ZARKG47TO8r0EiYb9ovzL9u0dA5Uq9ZCLh60UIFro54QtD0xZC9JHbRlv6c1gnkUJLP8dx4tDkZD';
     public $uid = '';
     // the api to send and retrieve data
     public function actionGetLike()
@@ -27,11 +27,7 @@ class ToolController extends \luya\console\Command
         if (empty($this->uid)) {
             $uid = $this->prompt('Pls input  UID or User Name:', ['required' => true]);
         }
-//1003855726425577&id=782860448525107&aid=1073741834
-        $url = str_replace(' ', '', "https://graph.facebook.com/1086555044822311?access_token=" . $this->access_token);
-        $responsez = $this->http(strip_tags($url));
-        $response = json_decode($responsez['data'], true);
-        print_r($response);die;
+
         $objPHPExcel = new PHPExcel();
         $objPHPExcel->getDefaultStyle()->getFont()->setName('Arial')
             ->setSize(10);
@@ -53,7 +49,6 @@ class ToolController extends \luya\console\Command
 
         $i = 2;
         $this->outputInfo('Found : ' . count($response['data']) . ' posts');
-        print_r($response['data']);die;
         foreach ($response['data'] as $post) {
             if (isset($post['comments']['data'])) {
                 $this->outputInfo('Found : ' . count($post['comments']['data']) . ' comments');
@@ -135,10 +130,6 @@ class ToolController extends \luya\console\Command
                     $this->outputInfo('++++++ Added email ' . $contact['email']);
                     $count++;
 
-                }
-                $i++;
-                if ($i >= 9000) {
-                    break;
                 }
             }
 
@@ -258,14 +249,6 @@ class ToolController extends \luya\console\Command
                 }
                 if ($i >= 9900) {
                     break;
-//                    $this->outputInfo('++++++ Sleep ++++++');
-//                    $i = 0;
-//                    // if it hasn't reached 60 seconds yet, sleep.
-//                    $sleep = microtime(true) - $time;
-//                    if ($sleep < 500) {
-//                        sleep(500 - $sleep);
-//                    }
-//                    $time = microtime(true);
                 }
             }
 
@@ -342,14 +325,12 @@ class ToolController extends \luya\console\Command
         $page = 1;
         $count = 0;
         $exists = 0;
-//        $rateLimit = $this->rateLimiter(700, 700);
         while ($data) {
             $apiUrl = "https://api.caresoft.vn/tmvngocdung/api/v1/tickets?created_since=2015-01-01T00:00:00Z&count=200&page=" . $page . "&order_by=created_at&order_type=desc";
             $result = $this->httpCareSoft($apiUrl);
             $response = json_decode($result['data'], true);
             $this->outputInfo("================= PAGE " . $page . " ====================");
             if (!empty($response) && isset($response['tickets']) && !empty($response['tickets'])) {
-//                $rateLimit(700);
                 $this->outputInfo('++++++ Found ' . count($response['tickets']) . ' tickets');
                 // Insert contact to user table
                 foreach ($response['tickets'] as $item) {
@@ -527,7 +508,7 @@ class ToolController extends \luya\console\Command
         return $this->outputSuccess("Sync data from CareSoft to Get Response finished. User added: " . $created);
     }
 
-
+    
     protected function postContactToGetResponse($apikey, $campaignid, $fullname, $email)
     {
         $data = array(
@@ -633,43 +614,6 @@ class ToolController extends \luya\console\Command
 
         return $response;
     }
-
-    /**
-     * @param int $rate
-     * @param int $per
-     * @return \Closure
-     */
-    protected function rateLimiter($rate = 5, $per = 8)
-    {
-        $last_check = microtime(True);
-        $allowance = $rate;
-
-        return function ($consumed = 1) use (
-            &$last_check,
-            &$allowance,
-            $rate,
-            $per
-        ) {
-            $current = microtime(True);
-            $time_passed = $current - $last_check;
-            $last_check = $current;
-
-            $allowance += $time_passed * ($rate / $per);
-            if ($allowance > $rate)
-                $allowance = $rate;
-
-            if ($allowance < $consumed) {
-                $duration = ($consumed - $allowance) * ($per / $rate);
-                $last_check += $duration;
-                usleep($duration * 1000000);
-                $allowance = 0;
-            } else
-                $allowance -= $consumed;
-
-            return;
-        };
-    }
-
 
     public function http($url)
     {
