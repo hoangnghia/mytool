@@ -150,7 +150,7 @@ class ToolController extends \luya\console\Command
         $count = 0;
         $exists = 0;
         while ($data) {
-            $apiUrl = "https://api.caresoft.vn/tmvngocdung/api/v1/tickets?created_since=2018-03-25T00:00:00Z&count=1000&page=" . $page . "&order_by=created_at&order_type=desc";
+            $apiUrl = "https://api.caresoft.vn/tmvngocdung/api/v1/tickets?created_since=2018-04-04T00:00:00Z&count=1000&page=" . $page . "&order_by=created_at&order_type=desc";
             $result = $this->httpCareSoft($apiUrl);
             $response = json_decode($result['data'], true);
             $this->outputInfo("================= PAGE " . $page . " ====================");
@@ -649,7 +649,7 @@ class ToolController extends \luya\console\Command
      */
     public function actionExportEmail(){
         $connection = \Yii::$app->db;
-        $email = $connection->createCommand("SELECT * FROM contact WHERE email <> '' && email IS NOT NULL AND username <> '' && username IS NOT NULL and status = 0 GROUP BY email");
+        $email = $connection->createCommand("SELECT * FROM contact WHERE email <> '' && email IS NOT NULL AND username <> '' && username IS NOT NULL and status = 0 GROUP BY email LIMIT 5000");
         $result = $email->queryAll();
         $data = [];
         $count = 0;
@@ -668,24 +668,24 @@ class ToolController extends \luya\console\Command
             if (in_array( $email, $data) )
                 continue;
             $pattern = '/^(?!(?:(?:\\x22?\\x5C[\\x00-\\x7E]\\x22?)|(?:\\x22?[^\\x5C\\x22]\\x22?)){255,})(?!(?:(?:\\x22?\\x5C[\\x00-\\x7E]\\x22?)|(?:\\x22?[^\\x5C\\x22]\\x22?)){65,}@)(?:(?:[\\x21\\x23-\\x27\\x2A\\x2B\\x2D\\x2F-\\x39\\x3D\\x3F\\x5E-\\x7E]+)|(?:\\x22(?:[\\x01-\\x08\\x0B\\x0C\\x0E-\\x1F\\x21\\x23-\\x5B\\x5D-\\x7F]|(?:\\x5C[\\x00-\\x7F]))*\\x22))(?:\\.(?:(?:[\\x21\\x23-\\x27\\x2A\\x2B\\x2D\\x2F-\\x39\\x3D\\x3F\\x5E-\\x7E]+)|(?:\\x22(?:[\\x01-\\x08\\x0B\\x0C\\x0E-\\x1F\\x21\\x23-\\x5B\\x5D-\\x7F]|(?:\\x5C[\\x00-\\x7F]))*\\x22)))*@(?:(?:(?!.*[^.]{64,})(?:(?:(?:xn--)?[a-z0-9]+(?:-+[a-z0-9]+)*\\.){1,126}){1,}(?:(?:[a-z][a-z0-9]*)|(?:(?:xn--)[a-z0-9]+))(?:-+[a-z0-9]+)*)|(?:\\[(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){7})|(?:(?!(?:.*[a-f0-9][:\\]]){7,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,5})?)))|(?:(?:IPv6:(?:(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){5}:)|(?:(?!(?:.*[a-f0-9]:){5,})(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3})?::(?:[a-f0-9]{1,4}(?::[a-f0-9]{1,4}){0,3}:)?)))?(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))(?:\\.(?:(?:25[0-5])|(?:2[0-4][0-9])|(?:1[0-9]{2})|(?:[1-9]?[0-9]))){3}))\\]))$/iD';
-            if (!preg_match($pattern, $email) === 1) {
+            if (preg_match($pattern, $email) === 1) {
+                $data[] =  $contact['email'];
+                /** Simply set value of cell */
+                $objPHPExcel->getActiveSheet(0)->setCellValue('A' . ($i), $count);
+                $objPHPExcel->getActiveSheet(0)->setCellValue('B' . ($i), ucwords($contact['username']));
+                $objPHPExcel->getActiveSheet(0)->setCellValue('C' . ($i), $email);
+
+                Yii::$app->db->createCommand("UPDATE contact SET status = 1 WHERE id=:id")
+                    ->bindValue(':id', $contact['id'])
+                    ->execute();
+
+                $count++;
+                $i++;
+                $this->outputInfo('Add email ' . $contact['email']);
+            }else{
                 $this->outputError('+++++++ Email ' . $email . ' is invalid');
                 continue;
             }
-
-            $data[] =  $contact['email'];
-            /** Simply set value of cell */
-            $objPHPExcel->getActiveSheet(0)->setCellValue('A' . ($i), $count);
-            $objPHPExcel->getActiveSheet(0)->setCellValue('B' . ($i), ucwords($contact['username']));
-            $objPHPExcel->getActiveSheet(0)->setCellValue('C' . ($i), $email);
-
-            Yii::$app->db->createCommand("UPDATE contact SET status = 1 WHERE id=:id")
-                ->bindValue(':id', $contact['id'])
-                ->execute();
-
-            $count++;
-            $i++;
-            $this->outputInfo('Add email ' . $contact['email']);
         }
         $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
         $a = 'danh-sach-email-' . date("Y-m-d-H-i") . '.xlsx';
@@ -695,9 +695,45 @@ class ToolController extends \luya\console\Command
     }
 
 
-    public function exportPhoneData(){
+    public function actionExportPhone(){
         $connection = \Yii::$app->db;
-        $email = $connection->createCommand("SELECT * from contact WHERE phone <> '' AND email IS NOT NULL");
-        $result = $email->queryAll();
+        $phone = $connection->createCommand("SELECT * FROM contact WHERE phone_no <> '' && phone_no IS NOT NULL AND username <> '' && username IS NOT NULL and status = 0 GROUP BY phone_no LIMIT 5000");
+        $result = $phone->queryAll();
+        $data = [];
+        $count = 0;
+
+        $objPHPExcel = new PHPExcel();
+        $objPHPExcel->getDefaultStyle()->getFont()->setName('Arial')
+            ->setSize(10);
+        $objPHPExcel->getActiveSheet()->setTitle('DS Phone');
+        $objPHPExcel->getActiveSheet()->setCellValue('A1', 'ID');
+        $objPHPExcel->getActiveSheet()->setCellValue('B1', 'Ten');
+        $objPHPExcel->getActiveSheet()->setCellValue('C1', 'Phone');
+        $objPHPExcel->setActiveSheetIndex(0);
+        $i = 2;
+        foreach ($result as $contact) {
+            $phone = trim($contact['phone_no']);
+            if (in_array( $phone, $data) )
+                continue;
+
+            $data[] =  $contact['email'];
+            /** Simply set value of cell */
+            $objPHPExcel->getActiveSheet(0)->setCellValue('A' . ($i), $count);
+            $objPHPExcel->getActiveSheet(0)->setCellValue('B' . ($i), ucwords($contact['username']));
+            $objPHPExcel->getActiveSheet(0)->setCellValue('C' . ($i), $phone);
+
+            Yii::$app->db->createCommand("UPDATE contact SET status = 1 WHERE id=:id")
+                ->bindValue(':id', $contact['id'])
+                ->execute();
+
+            $count++;
+            $i++;
+            $this->outputInfo('Add phone ' . $phone);
+        }
+        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+        $a = 'danh-sach-phone-' . date("Y-m-d-H-i") . '.xlsx';
+        $objWriter->save(Yii::getAlias('@runtime/') . '/files/' . $a);
+
+        $this->outputSuccess('Added phones: ' . $count);
     }
 }
